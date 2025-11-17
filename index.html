@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Te Ara Hura Trail Map</title>
@@ -9,11 +8,14 @@
   <script src="lib/maplibre-gl.5.10.0.js"></script>
   <link href="lib/maplibre-gl.5.10.0.css" rel="stylesheet" />
   
+  <!-- PMTiles support -->
+  <script src="lib/pmtiles.4.3.0.js"></script>
+    
   <style>
     /* Required CSS statements defining the map to be the full size of the viewport*/
     #map {
-      width: 100vw;
-      height: 100vh;
+      width: 95vw;
+      height: 95vh;
     }
   </style>
 </head>
@@ -21,6 +23,10 @@
   <div id="map"></div>
   
   <script>
+    // Initialize PMTiles protocol
+    const protocol = new pmtiles.Protocol();
+    maplibregl.addProtocol("pmtiles", protocol.tile);
+    
     // Javascript to create a new map using Maplibre GL JS
     const map = new maplibregl.Map({
       container: 'map',
@@ -28,6 +34,27 @@
       center: [175.0709, -36.7990], // Waiheke Island coordinates
       zoom: 12
     });
+
+    // Add navigation controls
+    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+    // Add scale control
+    map.addControl(new maplibregl.ScaleControl({
+      maxWidth: 100,
+      unit: 'metric'
+    }), 'bottom-left');
+
+    // Swap between trail layers on hover
+    map.on('mouseenter', 'te-ara_hura', function() {
+        map.setLayoutProperty('te-ara_hura', 'visibility', 'none');
+        map.setLayoutProperty('te-ara-hura-hover', 'visibility', 'visible');
+    });
+
+    map.on('mouseleave', 'te-ara-hura-hover', function() {
+        map.setLayoutProperty('te-ara_hura', 'visibility', 'visible');
+        map.setLayoutProperty('te-ara-hura-hover', 'visibility', 'none');
+    });
+
   </script>
 </body>
 </html>
